@@ -1,6 +1,6 @@
 import pytest
 import requests
-from helpers.generators import gerar_usuario, gerar_email_unico
+from helpers.generators import gerar_usuario
 
 BASE_URL = "https://compassuol.serverest.dev"
 
@@ -17,8 +17,15 @@ def usuario_payload():
 
 @pytest.fixture
 def usuario_criado(base_url, usuario_payload):
-    response = requests.post(f"{base_url}/usuarios", json=usuario_payload)
-    assert response.status_code == 201, f"Falha ao criar usuário no setup: {response.json()}"
+    response = requests.post(
+        f"{base_url}/usuarios",
+        json=usuario_payload
+    )
+
+    assert response.status_code == 201, (
+        f"Falha ao criar usuário no setup: {response.json()}"
+    )
+
     user_id = response.json()["_id"]
 
     yield {
