@@ -1,6 +1,7 @@
 import pytest
 import requests
 from helpers.generators import gerar_usuario
+from helpers.login_helper import realizar_login
 
 BASE_URL = "https://compassuol.serverest.dev"
 
@@ -9,6 +10,18 @@ BASE_URL = "https://compassuol.serverest.dev"
 def base_url():
     return BASE_URL
 
+@pytest.fixture
+def token_admin(base_url, usuario_criado):
+
+    response = realizar_login(
+        base_url,
+        usuario_criado["email"],
+        usuario_criado["password"]
+    )
+
+    assert response.status_code == 200
+
+    return response.json()["authorization"]
 
 @pytest.fixture
 def usuario_payload():
