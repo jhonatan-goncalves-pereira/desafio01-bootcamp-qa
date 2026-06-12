@@ -12,3 +12,11 @@ def gerar_usuario():
         "password": "teste@123",
         "administrador": "true"
     }
+    
+def gerar_produto():
+    return {
+        "nome": f"Produto QA {uuid.uuid4().hex[:8]}",
+        "preco": 100,
+        "descricao": "Produto criado via automação",
+        "quantidade": 50
+    }
