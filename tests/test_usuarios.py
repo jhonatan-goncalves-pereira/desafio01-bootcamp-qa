@@ -73,4 +73,58 @@ def test_cadastrar_usuario_sem_password_retorna_400(base_url):
         "administrador": "true"
     }
     response = requests.post(url, json=payload_incompleto)
-    assert response.status_code == 400, "Payload sem 'password' deveria retornar 400"
+    assert response.status_code == 400
+    
+
+def test_buscar_usuario_por_id_valido_retorna_200(base_url, usuario_criado):
+    url = f"{base_url}/usuarios/{usuario_criado['id']}"
+    response = requests.get(url)
+    data = response.json()
+    assert response.status_code == 200
+    assert data["_id"] == usuario_criado["id"]
+    assert data["email"] == usuario_criado["email"]
+    assert data["nome"] == usuario_criado["nome"]
+
+
+def test_buscar_usuario_por_id_inexistente_retorna_400(base_url):
+    url = f"{base_url}/usuarios/id_invalido_que_nao_existe_xyz"
+    response = requests.get(url)
+    assert response.status_code == 400
+    
+def test_atualizar_usuario_existente_retorna_200(base_url, usuario_criado):
+    url = f"{base_url}/usuarios/{usuario_criado['id']}"
+    payload_atualizado = {
+        "nome": "Nome Atualizado pelo QA",
+        "email": gerar_email_unico(),
+        "password": "novasenha456",
+        "administrador": "false"
+    }
+    response = requests.put(url, json=payload_atualizado)
+    assert response.status_code == 200
+    assert response.json()["message"] == "Registro alterado com sucesso"
+
+def test_atualizar_usuario_com_id_inexistente_cria_novo(base_url):
+    url = f"{base_url}/usuarios/id_que_nao_existe_abc123"
+    payload = gerar_usuario()
+    response = requests.put(url, json=payload)
+    data = response.json()
+    assert response.status_code == 201
+    assert "_id" in data
+    requests.delete(f"{base_url}/usuarios/{data['_id']}")
+
+def test_excluir_usuario_existente_retorna_200(base_url):
+    payload = gerar_usuario()
+    criacao = requests.post(f"{base_url}/usuarios", json=payload)
+    assert criacao.status_code == 201
+    user_id = criacao.json()["_id"]
+    response = requests.delete(f"{base_url}/usuarios/{user_id}")
+    assert response.status_code == 200
+    assert response.json()["message"] == "Registro excluído com sucesso"
+
+
+def test_excluir_usuario_id_inexistente_retorna_200_sem_registro(base_url):
+    url = f"{base_url}/usuarios/id_que_nao_existe_para_delete"
+    response = requests.delete(url)
+    assert response.status_code == 200
+    assert "Nenhum registro excluído" in response.json()["message"]
+
