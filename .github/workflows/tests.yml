@@ -11,12 +11,19 @@ on:
       - main
       - develop
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      tests_passed: ${{ steps.run_tests.outcome }}
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout do repositorio
         uses: actions/checkout@v4
 
       - name: Configurar Python 3.11
@@ -24,19 +31,53 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Instalar dependências
+      - name: Instalar dependencias
         run: pip install -r requirements.txt
 
-      - name: Verificar instalação do pytest-timeout
-        run: python -c "import pytest_timeout; print('pytest-timeout OK')"
+      - name: Instalar Allure CLI
+        run: |
+          wget -q https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+          tar -xzf allure-2.27.0.tgz
+          sudo mv allure-2.27.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/local/bin/allure
+          allure --version
 
-      - name: Executar testes
-        run: pytest --tb=short -v --html=report.html --self-contained-html
-        continue-on-error: false
+      - name: Executar testes com Allure
+        id: run_tests
+        run: pytest --tb=short -v --alluredir=allure-results --html=report.html --self-contained-html
 
-      - name: Publicar relatório HTML
+      - name: Gerar relatorio Allure
+        if: always()
+        run: allure generate allure-results --clean -o allure-report
+
+      - name: Publicar relatorio Allure (artefato para download)
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: relatorio-testes-${{ github.run_number }}
+          name: allure-report-${{ github.run_number }}
+          path: allure-report/
+
+      - name: Publicar relatorio HTML pytest-html
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-html-${{ github.run_number }}
           path: report.html
+
+      - name: Preparar GitHub Pages
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report/
+
+  deploy-pages:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy Allure Report no GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

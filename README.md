@@ -23,6 +23,7 @@ validação dos principais fluxos da API ServeRest.
 - [Bugs Encontrados e Reportados](#-bugs-encontrados-e-reportados)
 - [Melhorias Identificadas](#-melhorias-identificadas)
 - [Cobertura por Módulo](#-cobertura-por-módulo)
+- [Allure Reports](#-allure-reports)
 - [Extras Implementados](#-extras-implementados)
 - [Estatísticas](#-estatísticas)
 - [Boas Práticas Aplicadas](#-boas-práticas-aplicadas)
@@ -68,6 +69,7 @@ main                                          ← produção estável
 | `feature/bug-report-e-melhorias` | Bug reports documentados + melhorias iniciais identificadas |
 | `feature/readme-sumario-cobertura-detalhada` | Sumário no README + análise de cobertura pelos 8 critérios |
 | `feature/melhorias-m02-m05` | Implementação de C15 (carrinho sem token) e U21 (excluir usuário com carrinho) |
+| `feature/allure-reports` | Integração do Allure Framework: decoradores, CI e documentação |
 
 ---
 
@@ -81,6 +83,7 @@ main                                          ← produção estável
 | jsonschema | 4.23.0 | Validação de estrutura JSON |
 | pytest-html | 4.1.1 | Relatório HTML |
 | pytest-timeout | 2.4.0 | Timeout por teste (60s) |
+| allure-pytest | 2.13.5 | Relatório Allure interativo |
 | GitHub Actions | — | CI/CD automático |
 
 ---
@@ -107,6 +110,8 @@ desafio01-bootcamp-qa/
 │   ├── test_produtos.py       ← 20 testes
 │   └── test_usuarios.py       ← 21 testes
 │
+├── allure-results/        ← gerado automaticamente (gitignored)
+├── allure.properties          ← metadata do ambiente para o report
 ├── conftest.py                ← fixtures com estratégia de auth robusta
 ├── PLANO-DE-TESTES.md
 ├── pytest.ini                 ← timeout=60s configurado
@@ -482,6 +487,71 @@ Oportunidades de evolução mapeadas após análise de cobertura e execução ex
 | C15 | Criar sem token → 401 `[M02]` | ✅ |
 
 ---
+
+
+---
+
+
+---
+
+## 📊 Allure Reports
+
+> **🔗 Relatório publicado via GitHub Pages (atualizado automaticamente a cada push na main):**
+>
+> ## ➡️ [https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/](https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/)
+>
+> Preferência por download? Acesse [Actions → run mais recente → Artifacts → allure-report-N](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/actions/workflows/tests.yml), baixe o zip e abra `index.html`.
+
+A branch `feature/allure-reports` integra o [Allure Framework](https://docs.qameta.io/allure/) à suíte,
+gerando relatórios HTML interativos com rastreabilidade total dos 63 testes.
+
+### O que o relatório exibe
+
+| Camada | Detalhe |
+|---|---|
+| **Epic / Feature / Story** | Hierarquia completa dos 63 testes por módulo |
+| **Severity** | BLOCKER, CRITICAL, NORMAL, MINOR por teste |
+| **Steps** | Passos internos de cada teste (Arrange → Act → Assert) |
+| **Attachments** | Response body JSON anexado como evidência |
+| **Issues linkadas** | BUG #1 ao #5 linkados nos testes de regressão |
+| **Tags** | smoke, negativo, positivo, borda, bug, segurança |
+
+### Como gerar localmente
+
+```bash
+# 1. Instalar dependências (allure-pytest já incluído)
+pip install -r requirements.txt
+
+# 2. Rodar testes — gera allure-results/ automaticamente
+pytest
+
+# 3. Instalar Allure CLI (uma vez só)
+# Windows (scoop): scoop install allure
+# macOS (brew):    brew install allure
+# Linux (snap):    snap install allure
+# Ou baixe em:     https://github.com/allure-framework/allure2/releases
+
+# 4. Abrir relatório no browser
+allure serve allure-results
+```
+
+### No CI (GitHub Actions)
+
+O workflow `.github/workflows/tests.yml` executa a cada push e PR:
+
+1. Instala dependências + Allure CLI 2.27.0
+2. Roda `pytest --alluredir=allure-results`
+3. Gera `allure generate allure-results -o allure-report`
+4. Publica **dois artefatos** numerados por run:
+
+| Artefato | Conteúdo |
+|---|---|
+| `allure-report-N` | Relatório Allure completo (HTML interativo) |
+| `relatorio-html-N` | Relatório pytest-html (alternativa leve) |
+
+
+---
+
 
 ## 🔍 Extras Implementados
 
