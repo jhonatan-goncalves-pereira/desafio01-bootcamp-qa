@@ -98,10 +98,10 @@ desafio01-bootcamp-qa/
 │   └── usuarios_helper.py
 │
 ├── tests/
-│   ├── test_carrinho.py       ← 14 testes
+│   ├── test_carrinho.py       ← 15 testes
 │   ├── test_login.py          ← 7 testes
 │   ├── test_produtos.py       ← 20 testes
-│   └── test_usuarios.py       ← 20 testes
+│   └── test_usuarios.py       ← 21 testes
 │
 ├── conftest.py                ← fixtures com estratégia de auth robusta
 ├── PLANO-DE-TESTES.md
@@ -592,10 +592,10 @@ Pipeline em `.github/workflows/tests.yml`:
 | Módulo | Testes | Bugs cobertos |
 |---|---|---|
 | Login | 7 | 1 |
-| Usuários | 20 | 2 |
+| Usuários | 21 | 2 |
 | Produtos | 20 | 3 |
-| Carrinho | 14 | 2 |
-| **Total** | **61** | **5** |
+| Carrinho | 15 | 2 |
+| **Total** | **63** | **5** |
 
 ---
 

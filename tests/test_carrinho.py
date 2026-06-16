@@ -202,6 +202,27 @@ def test_cancelar_compra_sem_carrinho_retorna_200_com_aviso(base_url, token_admi
     assert "Não foi encontrado carrinho" in body["message"]
 
 
+def test_criar_carrinho_sem_token_retorna_401(base_url, produto_criado):
+    """C15 — [M02] POST /carrinhos sem token de autenticação retorna 401.
+
+    O endpoint de criação de carrinho exige autenticação. Uma requisição sem
+    o header Authorization deve ser rejeitada com 401 Unauthorized.
+    """
+    import requests as req
+    response = req.post(
+        f"{base_url}/carrinhos",
+        json={
+            "produtos": [
+                {"idProduto": produto_criado["id"], "quantidade": 1}
+            ]
+        },
+    )
+
+    assert response.status_code == 401
+    body = response.json()
+    assert "message" in body
+
+
 def test_cancelar_compra_devolve_estoque_ao_produto(base_url, token_admin):
     import requests as req
 
