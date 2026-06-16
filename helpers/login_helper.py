@@ -1,8 +1,5 @@
 import requests
 
-# Timeout em segundos para chamadas ao endpoint /login.
-# A instância compassuol.serverest.dev trava indefinidamente para
-# usuários criados dinamicamente; 10 s evita que a suite inteira trave.
 LOGIN_TIMEOUT = 10
 
 
