@@ -20,6 +20,10 @@ env/
 report.html
 assets/
 
+# Allure
+allure-results/
+allure-report/
+
 # IDEs
 .vscode/
 .idea/
