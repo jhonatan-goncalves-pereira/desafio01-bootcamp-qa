@@ -277,7 +277,7 @@ class TestProdutos:
             response = excluir_produto(base_url, token_admin, produto_id)
         with allure.step("Validar 200"):
             assert response.status_code == 200
-            assert response.json()["message"] == "Registro excluido com sucesso"
+            assert response.json()["message"] == "Registro exclu\u00eddo com sucesso"
 
     @allure.story("Exclusao")
     @allure.title("P20 - Excluir produto com carrinho ativo retorna 400")

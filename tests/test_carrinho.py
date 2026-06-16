@@ -201,7 +201,7 @@ class TestCarrinhos:
             response = concluir_compra(base_url, token_admin)
         with allure.step("Validar 200"):
             assert response.status_code == 200
-            assert response.json()["message"] == "Registro excluido com sucesso"
+            assert response.json()["message"] == "Registro exclu\u00eddo com sucesso"
 
     @allure.story("Fluxo de compra")
     @allure.title("C12 - Concluir sem carrinho retorna 200 com aviso [BUG #5]")

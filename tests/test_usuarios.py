@@ -224,7 +224,7 @@ class TestUsuarios:
     def test_excluir_usuario_existente_retorna_200(self, base_url, usuario_criado):
         response = excluir_usuario(base_url, usuario_criado["id"])
         assert response.status_code == 200
-        assert response.json()["message"] == "Registro excluido com sucesso"
+        assert response.json()["message"] == "Registro exclu\u00eddo com sucesso"
 
     @allure.story("Exclusao")
     @allure.title("U20 - Excluir ID inexistente retorna 200 sem registro")
@@ -233,7 +233,7 @@ class TestUsuarios:
     def test_excluir_usuario_id_inexistente_retorna_200_sem_registro(self, base_url):
         response = excluir_usuario(base_url, "id_que_nao_existe_para_delete")
         assert response.status_code == 200
-        assert "Nenhum registro excluido" in response.json()["message"]
+        assert "Nenhum registro exclu\u00eddo" in response.json()["message"]
 
     @allure.story("Exclusao")
     @allure.title("U21 - Excluir usuario com carrinho ativo retorna 400 [M05]")
