@@ -11,6 +11,11 @@ on:
       - main
       - develop
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -43,7 +48,16 @@ jobs:
         if: always()
         run: allure generate allure-results --clean -o allure-report
 
-      - name: Publicar relatorio Allure
+      - name: Publicar relatorio Allure no GitHub Pages
+        if: always() && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          publish_branch: gh-pages
+          destination_dir: allure-report
+
+      - name: Publicar relatorio Allure como artefato
         uses: actions/upload-artifact@v4
         if: always()
         with:

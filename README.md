@@ -25,7 +25,6 @@ validação dos principais fluxos da API ServeRest.
 - [Cobertura por Módulo](#-cobertura-por-módulo)
 - [Allure Reports](#-allure-reports)
 - [Extras Implementados](#-extras-implementados)
-- [Allure Reports](#-allure-reports)
 - [Estatísticas](#-estatísticas)
 - [Boas Práticas Aplicadas](#-boas-práticas-aplicadas)
 
@@ -492,104 +491,67 @@ Oportunidades de evolução mapeadas após análise de cobertura e execução ex
 
 ---
 
+
+---
+
 ## 📊 Allure Reports
 
-O projeto conta com integração completa com o [Allure Framework](https://allurepy.readthedocs.io/), gerando relatórios HTML interativos com rastreabilidade total dos testes.
+> **🔗 Relatório publicado (GitHub Pages — atualizado a cada push na main):**
+> **[https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/allure-report/](https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/allure-report/)**
+>
+> Preferência por download? Acesse [Actions](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/actions/workflows/tests.yml)
+> → run mais recente → **Artifacts** → baixe **`allure-report-N`** → extraia e abra `index.html`
+
+A branch `feature/allure-reports` integra o [Allure Framework](https://docs.qameta.io/allure/) à suíte,
+gerando relatórios HTML interativos com rastreabilidade total dos 63 testes.
 
 ### O que o relatório exibe
 
-| Dimensão | Detalhe |
+| Camada | Detalhe |
 |---|---|
-| **Epic / Feature / Story** | Hierarquia de todos os 63 testes por módulo |
+| **Epic / Feature / Story** | Hierarquia completa dos 63 testes por módulo |
 | **Severity** | BLOCKER, CRITICAL, NORMAL, MINOR por teste |
 | **Steps** | Passos internos de cada teste (Arrange → Act → Assert) |
-| **Attachments** | Response body JSON anexado nos testes de listagem |
-| **Issues linkadas** | BUG #1 ao #5 linkados diretamente nos testes de regressão |
-| **Tags** | smoke, 
-egativo, positivo, orda, ug, seguranca |
+| **Attachments** | Response body JSON anexado como evidência |
+| **Issues linkadas** | BUG #1 ao #5 linkados nos testes de regressão |
+| **Tags** | smoke, negativo, positivo, borda, bug, segurança |
 
-### Gerar o relatório localmente
+### Como gerar localmente
 
-`ash
-# 1. Instalar dependências
+```bash
+# 1. Instalar dependências (allure-pytest já incluído)
 pip install -r requirements.txt
 
-# 2. Rodar os testes (gera a pasta allure-results/)
+# 2. Rodar testes — gera allure-results/ automaticamente
 pytest
 
-# 3. Instalar Allure CLI (necessário uma vez)
-# macOS:  brew install allure
-# Linux:  snap install allure
-# Windows: scoop install allure
+# 3. Instalar Allure CLI (uma vez só)
+# Windows (scoop): scoop install allure
+# macOS (brew):    brew install allure
+# Linux (snap):    snap install allure
+# Ou baixe em:     https://github.com/allure-framework/allure2/releases
 
-# 4. Abrir o relatório no browser
+# 4. Abrir relatório no browser
 allure serve allure-results
-`
-
-> A pasta llure-results/ está no .gitignore. Apenas os resultados brutos são gerados localmente.
-
-### Relatório no CI (GitHub Actions)
-
-A cada push ou pull request, o workflow:
-1. Executa os 63 testes com --alluredir=allure-results
-2. Gera o relatório HTML estático com llure generate
-3. Publica como **artefato** numerado por run (llure-report-N)
-
-Para baixar: vá em **Actions → run desejada → Artifacts → allure-report-N**.
-
-
----
-
-## 📊 Allure Reports
-
-A suíte gera relatórios interativos com o [Allure Framework](https://docs.qameta.io/allure/), permitindo
-visualizar resultados por módulo, severidade, tag e histórico de execuções.
-
-### Como executar localmente
-
-`ash
-# 1. Instalar dependências (allure-pytest já incluído no requirements.txt)
-pip install -r requirements.txt
-
-# 2. Rodar os testes — os resultados são salvos em allure-results/
-pytest
-
-# 3. Gerar e abrir o relatório no browser
-allure serve allure-results
-`
-
-> Para instalar o Allure CLI: https://docs.qameta.io/allure/#_installing_a_commandline
-
-### Estrutura do relatório
-
-Os testes são organizados com decoradores que geram uma hierarquia clara no relatório:
-
-| Decorator | Valor | O que representa |
-|---|---|---|
-| @allure.epic | ServeRest API | Produto / sistema |
-| @allure.feature | Login / Usuarios / Produtos / Carrinhos | Módulo da API |
-| @allure.story | Listagem / Cadastro / Autenticacao... | Funcionalidade |
-| @allure.severity | BLOCKER / CRITICAL / NORMAL / MINOR | Prioridade do teste |
-| @allure.tag | smoke / negativo / bug / regressao... | Categoria livre |
-| @allure.issue | #1 ao #5 | Link para bug reports |
-| llure.step | Descrição de cada passo | Rastreabilidade AAA |
-| llure.attach | Response body JSON | Evidência inline |
+```
 
 ### No CI (GitHub Actions)
 
-A cada push/PR, o workflow:
-1. Executa os testes com --alluredir=allure-results
-2. Gera o relatório HTML com llure generate
-3. Publica como artefato numerado por run em **Actions → Artifacts**
+O workflow `.github/workflows/tests.yml` executa a cada push e PR:
 
-`
-allure-report-<run_number>/   ← relatório Allure completo
-relatorio-html-<run_number>/  ← relatório pytest-html (legado)
-`
+1. Instala dependências + Allure CLI 2.27.0
+2. Roda `pytest --alluredir=allure-results`
+3. Gera `allure generate allure-results -o allure-report`
+4. Publica **dois artefatos** numerados por run:
 
-### Extras Implementados
+| Artefato | Conteúdo |
+|---|---|
+| `allure-report-N` | Relatório Allure completo (HTML interativo) |
+| `relatorio-html-N` | Relatório pytest-html (alternativa leve) |
+
 
 ---
+
 
 ## 🔍 Extras Implementados
 
