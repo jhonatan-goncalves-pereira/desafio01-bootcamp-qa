@@ -496,11 +496,11 @@ Oportunidades de evolução mapeadas após análise de cobertura e execução ex
 
 ## 📊 Allure Reports
 
-> **🔗 Relatório publicado (GitHub Pages — atualizado a cada push na main):**
-> **[https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/allure-report/](https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/allure-report/)**
+> **🔗 Relatório publicado via GitHub Pages (atualizado automaticamente a cada push na main):**
 >
-> Preferência por download? Acesse [Actions](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/actions/workflows/tests.yml)
-> → run mais recente → **Artifacts** → baixe **`allure-report-N`** → extraia e abra `index.html`
+> ## ➡️ [https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/](https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/)
+>
+> Preferência por download? Acesse [Actions → run mais recente → Artifacts → allure-report-N](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/actions/workflows/tests.yml), baixe o zip e abra `index.html`.
 
 A branch `feature/allure-reports` integra o [Allure Framework](https://docs.qameta.io/allure/) à suíte,
 gerando relatórios HTML interativos com rastreabilidade total dos 63 testes.

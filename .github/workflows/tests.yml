@@ -19,6 +19,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      tests_passed: ${{ steps.run_tests.outcome }}
 
     steps:
       - name: Checkout do repositorio
@@ -41,23 +43,14 @@ jobs:
           allure --version
 
       - name: Executar testes com Allure
+        id: run_tests
         run: pytest --tb=short -v --alluredir=allure-results --html=report.html --self-contained-html
-        continue-on-error: false
 
       - name: Gerar relatorio Allure
         if: always()
         run: allure generate allure-results --clean -o allure-report
 
-      - name: Publicar relatorio Allure no GitHub Pages
-        if: always() && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report
-          publish_branch: gh-pages
-          destination_dir: allure-report
-
-      - name: Publicar relatorio Allure como artefato
+      - name: Publicar relatorio Allure (artefato para download)
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -70,3 +63,21 @@ jobs:
         with:
           name: relatorio-html-${{ github.run_number }}
           path: report.html
+
+      - name: Preparar GitHub Pages
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report/
+
+  deploy-pages:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy Allure Report no GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
