@@ -263,3 +263,29 @@ def test_excluir_usuario_id_inexistente_retorna_200_sem_registro(base_url):
 
     assert response.status_code == 200
     assert "Nenhum registro excluído" in response.json()["message"]
+
+
+def test_excluir_usuario_com_carrinho_ativo_retorna_400(base_url, usuario_criado, token_admin, produto_criado):
+    """U21 — [M05] DELETE /usuarios/{id} com carrinho ativo retorna 400.
+
+    A API deve impedir a exclusão de um usuário que possui carrinho ativo,
+    pois os dados do carrinho ficariam órfãos. O endpoint deve retornar 400
+    com mensagem explicativa ao invés de excluir o registro.
+    """
+    from helpers.carrinho_helper import criar_carrinho, cancelar_compra
+
+    # Criar carrinho para o usuário admin
+    r_carrinho = criar_carrinho(base_url, token_admin, produto_criado["id"])
+    assert r_carrinho.status_code == 201, (
+        f"Setup falhou ao criar carrinho: {r_carrinho.json()}"
+    )
+
+    # Tentar excluir o usuário enquanto tem carrinho ativo
+    response = excluir_usuario(base_url, usuario_criado["id"])
+
+    # Teardown: limpar o carrinho independente do resultado
+    cancelar_compra(base_url, token_admin)
+
+    assert response.status_code == 400
+    body = response.json()
+    assert "message" in body
