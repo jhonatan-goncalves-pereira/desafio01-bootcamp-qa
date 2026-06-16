@@ -23,7 +23,9 @@ validação dos principais fluxos da API ServeRest.
 - [Bugs Encontrados e Reportados](#-bugs-encontrados-e-reportados)
 - [Melhorias Identificadas](#-melhorias-identificadas)
 - [Cobertura por Módulo](#-cobertura-por-módulo)
+- [Allure Reports](#-allure-reports)
 - [Extras Implementados](#-extras-implementados)
+- [Allure Reports](#-allure-reports)
 - [Estatísticas](#-estatísticas)
 - [Boas Práticas Aplicadas](#-boas-práticas-aplicadas)
 
@@ -68,6 +70,7 @@ main                                          ← produção estável
 | `feature/bug-report-e-melhorias` | Bug reports documentados + melhorias iniciais identificadas |
 | `feature/readme-sumario-cobertura-detalhada` | Sumário no README + análise de cobertura pelos 8 critérios |
 | `feature/melhorias-m02-m05` | Implementação de C15 (carrinho sem token) e U21 (excluir usuário com carrinho) |
+| `feature/allure-reports` | Integração do Allure Framework: decoradores, CI e documentação |
 
 ---
 
@@ -81,6 +84,7 @@ main                                          ← produção estável
 | jsonschema | 4.23.0 | Validação de estrutura JSON |
 | pytest-html | 4.1.1 | Relatório HTML |
 | pytest-timeout | 2.4.0 | Timeout por teste (60s) |
+| allure-pytest | 2.13.5 | Relatório Allure interativo |
 | GitHub Actions | — | CI/CD automático |
 
 ---
@@ -107,6 +111,8 @@ desafio01-bootcamp-qa/
 │   ├── test_produtos.py       ← 20 testes
 │   └── test_usuarios.py       ← 21 testes
 │
+├── allure-results/        ← gerado automaticamente (gitignored)
+├── allure.properties          ← metadata do ambiente para o report
 ├── conftest.py                ← fixtures com estratégia de auth robusta
 ├── PLANO-DE-TESTES.md
 ├── pytest.ini                 ← timeout=60s configurado
@@ -480,6 +486,108 @@ Oportunidades de evolução mapeadas após análise de cobertura e execução ex
 | C12–C13 | Cancelar/concluir sem carrinho `[BUG #5]` | ✅ |
 | C14 | Cancelar restaura estoque | ✅ |
 | C15 | Criar sem token → 401 `[M02]` | ✅ |
+
+---
+
+
+---
+
+## 📊 Allure Reports
+
+O projeto conta com integração completa com o [Allure Framework](https://allurepy.readthedocs.io/), gerando relatórios HTML interativos com rastreabilidade total dos testes.
+
+### O que o relatório exibe
+
+| Dimensão | Detalhe |
+|---|---|
+| **Epic / Feature / Story** | Hierarquia de todos os 63 testes por módulo |
+| **Severity** | BLOCKER, CRITICAL, NORMAL, MINOR por teste |
+| **Steps** | Passos internos de cada teste (Arrange → Act → Assert) |
+| **Attachments** | Response body JSON anexado nos testes de listagem |
+| **Issues linkadas** | BUG #1 ao #5 linkados diretamente nos testes de regressão |
+| **Tags** | smoke, 
+egativo, positivo, orda, ug, seguranca |
+
+### Gerar o relatório localmente
+
+`ash
+# 1. Instalar dependências
+pip install -r requirements.txt
+
+# 2. Rodar os testes (gera a pasta allure-results/)
+pytest
+
+# 3. Instalar Allure CLI (necessário uma vez)
+# macOS:  brew install allure
+# Linux:  snap install allure
+# Windows: scoop install allure
+
+# 4. Abrir o relatório no browser
+allure serve allure-results
+`
+
+> A pasta llure-results/ está no .gitignore. Apenas os resultados brutos são gerados localmente.
+
+### Relatório no CI (GitHub Actions)
+
+A cada push ou pull request, o workflow:
+1. Executa os 63 testes com --alluredir=allure-results
+2. Gera o relatório HTML estático com llure generate
+3. Publica como **artefato** numerado por run (llure-report-N)
+
+Para baixar: vá em **Actions → run desejada → Artifacts → allure-report-N**.
+
+
+---
+
+## 📊 Allure Reports
+
+A suíte gera relatórios interativos com o [Allure Framework](https://docs.qameta.io/allure/), permitindo
+visualizar resultados por módulo, severidade, tag e histórico de execuções.
+
+### Como executar localmente
+
+`ash
+# 1. Instalar dependências (allure-pytest já incluído no requirements.txt)
+pip install -r requirements.txt
+
+# 2. Rodar os testes — os resultados são salvos em allure-results/
+pytest
+
+# 3. Gerar e abrir o relatório no browser
+allure serve allure-results
+`
+
+> Para instalar o Allure CLI: https://docs.qameta.io/allure/#_installing_a_commandline
+
+### Estrutura do relatório
+
+Os testes são organizados com decoradores que geram uma hierarquia clara no relatório:
+
+| Decorator | Valor | O que representa |
+|---|---|---|
+| @allure.epic | ServeRest API | Produto / sistema |
+| @allure.feature | Login / Usuarios / Produtos / Carrinhos | Módulo da API |
+| @allure.story | Listagem / Cadastro / Autenticacao... | Funcionalidade |
+| @allure.severity | BLOCKER / CRITICAL / NORMAL / MINOR | Prioridade do teste |
+| @allure.tag | smoke / negativo / bug / regressao... | Categoria livre |
+| @allure.issue | #1 ao #5 | Link para bug reports |
+| llure.step | Descrição de cada passo | Rastreabilidade AAA |
+| llure.attach | Response body JSON | Evidência inline |
+
+### No CI (GitHub Actions)
+
+A cada push/PR, o workflow:
+1. Executa os testes com --alluredir=allure-results
+2. Gera o relatório HTML com llure generate
+3. Publica como artefato numerado por run em **Actions → Artifacts**
+
+`
+allure-report-<run_number>/   ← relatório Allure completo
+relatorio-html-<run_number>/  ← relatório pytest-html (legado)
+`
+
+### Extras Implementados
 
 ---
 
