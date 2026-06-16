@@ -2,9 +2,14 @@ name: API Tests
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
+      - develop
+      - "feature/**"
   pull_request:
-    branches: ["**"]
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
@@ -29,5 +34,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: relatorio-testes
+          name: relatorio-testes-${{ github.run_number }}
           path: report.html
