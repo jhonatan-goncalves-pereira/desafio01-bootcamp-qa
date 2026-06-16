@@ -121,6 +121,9 @@ def test_criar_produto_quantidade_zero_aceito_mas_inutilizavel(base_url, token_a
     assert response.status_code == 201, "API deveria aceitar (BUG documentado)"
     produto_id = response.json()["_id"]
 
+    # Garantir que não há carrinho ativo (estado sujo de teste anterior)
+    cancelar_compra(base_url, token_admin)
+
     # Consequência: produto não pode ser usado no carrinho
     r_carrinho = criar_carrinho(base_url, token_admin, produto_id)
     assert r_carrinho.status_code == 400
@@ -219,19 +222,21 @@ def test_atualizar_produto_existente_retorna_200(base_url, token_admin, produto_
 
 
 def test_atualizar_produto_com_nome_de_outro_produto_retorna_400(base_url, token_admin):
-    prod_a = criar_produto(base_url, token_admin, gerar_produto())
-    nome_a = f"NomeFixo {__import__('uuid').uuid4().hex[:6]}"
-    requests_mod = __import__("requests")
-    prod_a_r = requests_mod.post(
-        f"{base_url}/produtos",
-        json={**gerar_produto(), "nome": nome_a},
-        headers={"Authorization": token_admin},
-    )
-    pid_a = prod_a_r.json()["_id"]
-    prod_b = criar_produto(base_url, token_admin, gerar_produto())
-    pid_b = prod_b.json()["_id"]
+    import uuid
+    nome_fixo = f"NomeFixo {uuid.uuid4().hex[:6]}"
 
-    response = atualizar_produto(base_url, token_admin, pid_b, {**gerar_produto(), "nome": nome_a})
+    # Criar produto A com o nome fixo
+    r_a = criar_produto(base_url, token_admin, {**gerar_produto(), "nome": nome_fixo})
+    assert r_a.status_code == 201, f"Falha ao criar produto A: {r_a.json()}"
+    pid_a = r_a.json()["_id"]
+
+    # Criar produto B com nome genérico
+    r_b = criar_produto(base_url, token_admin, gerar_produto())
+    assert r_b.status_code == 201, f"Falha ao criar produto B: {r_b.json()}"
+    pid_b = r_b.json()["_id"]
+
+    # Tentar renomear B para o mesmo nome de A → deve retornar 400
+    response = atualizar_produto(base_url, token_admin, pid_b, {**gerar_produto(), "nome": nome_fixo})
 
     assert response.status_code == 400
     assert "message" in response.json()
