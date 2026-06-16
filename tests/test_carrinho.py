@@ -78,6 +78,7 @@ class TestCarrinhos:
     @allure.severity(allure.severity_level.NORMAL)
     @allure.tag("positivo", "contrato")
     def test_criar_carrinho_valida_schema_do_carrinho(self, base_url, token_admin, produto_criado):
+        cancelar_compra(base_url, token_admin)  # garante estado limpo
         with allure.step("Criar carrinho e buscar por ID"):
             r = criar_carrinho(base_url, token_admin, produto_criado["id"])
             assert r.status_code == 201
