@@ -191,7 +191,7 @@ Um teste é considerado **pronto** quando atende a todos os critérios abaixo:
 
 | Data | Versão | Mudança |
 |---|---|---|
-| 2026-06-15 | 1.0 | Criação do plano inicial com escopo e estratégia |
-| 2026-06-15 | 1.1 | Expansão para Login e Produtos |
+| 2026-06-12 | 1.0 | Criação do plano inicial com escopo e estratégia |
+| 2026-06-13 | 1.1 | Expansão para Login e Produtos |
 | 2026-06-15 | 2.0 | Execução exploratória — 5 bugs identificados; 61 testes; cobertura 100% |
 | 2026-06-16 | 2.1 | Adição da seção de Melhorias Identificadas (M01–M07); histórico revisado |
