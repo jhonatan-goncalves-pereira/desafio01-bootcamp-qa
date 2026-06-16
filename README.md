@@ -9,6 +9,26 @@ validação dos principais fluxos da API ServeRest.
 
 ---
 
+## 📋 Sumário
+
+- [Objetivo](#-objetivo)
+- [API Utilizada](#-api-utilizada)
+- [Estratégia de Branches](#-estratégia-de-branches)
+- [Stack](#️-stack)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Arquitetura](#-arquitetura)
+- [Instalação](#️-instalação)
+- [Executando os Testes](#️-executando-os-testes)
+- [Análise de Cobertura](#-análise-de-cobertura)
+- [Bugs Encontrados e Reportados](#-bugs-encontrados-e-reportados)
+- [Melhorias Identificadas](#-melhorias-identificadas)
+- [Cobertura por Módulo](#-cobertura-por-módulo)
+- [Extras Implementados](#-extras-implementados)
+- [Estatísticas](#-estatísticas)
+- [Boas Práticas Aplicadas](#-boas-práticas-aplicadas)
+
+---
+
 ## 🎯 Objetivo
 
 Garantir a qualidade dos principais endpoints da API através de testes automatizados cobrindo:
@@ -155,46 +175,220 @@ pytest -k "BUG" -v                              # só testes de regressão de bu
 
 ### Método utilizado
 
-Cobertura calculada conforme o artigo
-[Como verificar a cobertura de testes da API REST](https://medium.com/revista-dtar/como-verificar-a-cobertura-de-testes-da-api-rest-9e2f745564b).
-A métrica é baseada em **operações** — cada par `endpoint + método HTTP` é uma operação.
+Cobertura calculada conforme os critérios definidos no artigo
+[Como verificar a cobertura de testes da API REST](https://medium.com/revista-dtar/como-verificar-a-cobertura-de-testes-da-api-rest-9e2f745564b)
+(Nayara Crema, Revista DTAR, 2020), que define **8 critérios** baseados em
+*Input Coverage* e *Output Coverage*.
 
-```
-Cobertura (%) = (operações com pelo menos 1 teste / total de operações mapeadas) × 100
-```
+---
 
-### Mapeamento das operações
+### 1. Path Coverage (Input)
 
-| Endpoint | Método | Operação | Coberta? |
-|---|---|---|---|
-| `/login` | POST | Autenticar usuário | ✅ |
-| `/usuarios` | GET | Listar usuários | ✅ |
-| `/usuarios` | POST | Criar usuário | ✅ |
-| `/usuarios/{id}` | GET | Buscar usuário por ID | ✅ |
-| `/usuarios/{id}` | PUT | Atualizar usuário | ✅ |
-| `/usuarios/{id}` | DELETE | Excluir usuário | ✅ |
-| `/produtos` | GET | Listar produtos | ✅ |
-| `/produtos` | POST | Criar produto | ✅ |
-| `/produtos/{id}` | GET | Buscar produto por ID | ✅ |
-| `/produtos/{id}` | PUT | Atualizar produto | ✅ |
-| `/produtos/{id}` | DELETE | Excluir produto | ✅ |
-| `/carrinhos` | GET | Listar carrinhos | ✅ |
-| `/carrinhos` | POST | Criar carrinho | ✅ |
-| `/carrinhos/{id}` | GET | Buscar carrinho por ID | ✅ |
-| `/carrinhos/cancelar-compra` | DELETE | Cancelar compra | ✅ |
-| `/carrinhos/concluir-compra` | DELETE | Concluir compra | ✅ |
+Mede quantas URIs únicas da API estão cobertas (independente do método HTTP).
 
-### Resultado
+A ServeRest possui **9 paths** únicos:
 
-| Métrica | Valor |
+| URI | Coberta? |
 |---|---|
-| Total de operações mapeadas | 16 |
-| Operações cobertas | 16 |
-| **Cobertura de operações** | **100%** |
-| Total de testes automatizados | 61 |
-| Testes passando | 61 |
-| Bugs documentados e reportados | 5 |
-| Melhorias identificadas | 7 |
+| `/login` | ✅ |
+| `/usuarios` | ✅ |
+| `/usuarios/{id}` | ✅ |
+| `/produtos` | ✅ |
+| `/produtos/{id}` | ✅ |
+| `/carrinhos` | ✅ |
+| `/carrinhos/{id}` | ✅ |
+| `/carrinhos/cancelar-compra` | ✅ |
+| `/carrinhos/concluir-compra` | ✅ |
+
+**Path Coverage = 9/9 = 100%**
+
+---
+
+### 2. Operator Coverage (Input)
+
+Mede quantas operações (par `URI + método HTTP`) estão cobertas.
+
+| Endpoint | Método | Coberta? |
+|---|---|---|
+| `/login` | POST | ✅ |
+| `/usuarios` | GET | ✅ |
+| `/usuarios` | POST | ✅ |
+| `/usuarios/{id}` | GET | ✅ |
+| `/usuarios/{id}` | PUT | ✅ |
+| `/usuarios/{id}` | DELETE | ✅ |
+| `/produtos` | GET | ✅ |
+| `/produtos` | POST | ✅ |
+| `/produtos/{id}` | GET | ✅ |
+| `/produtos/{id}` | PUT | ✅ |
+| `/produtos/{id}` | DELETE | ✅ |
+| `/carrinhos` | GET | ✅ |
+| `/carrinhos` | POST | ✅ |
+| `/carrinhos/{id}` | GET | ✅ |
+| `/carrinhos/cancelar-compra` | DELETE | ✅ |
+| `/carrinhos/concluir-compra` | DELETE | ✅ |
+
+**Operator Coverage = 16/16 = 100%**
+
+---
+
+### 3. Parameter Coverage (Input)
+
+Mede se cada parâmetro de cada operação foi exercitado pelo menos uma vez.
+Inclui parâmetros de query, path e body.
+
+| Operação | Parâmetro | Coberto? |
+|---|---|---|
+| `POST /login` | `email` | ✅ |
+| `POST /login` | `password` | ✅ |
+| `GET /usuarios` | `_id` (query) | ✅ (via filtro email) |
+| `GET /usuarios` | `nome` (query) | ❌ não testado diretamente |
+| `GET /usuarios` | `email` (query) | ✅ |
+| `GET /usuarios` | `password` (query) | ❌ não testado |
+| `GET /usuarios` | `administrador` (query) | ✅ |
+| `POST /usuarios` | `nome`, `email`, `password`, `administrador` | ✅ |
+| `GET /usuarios/{id}` | `id` (path) | ✅ |
+| `PUT /usuarios/{id}` | `id` (path) + body completo | ✅ |
+| `DELETE /usuarios/{id}` | `id` (path) | ✅ |
+| `GET /produtos` | `nome` (query) | ✅ |
+| `GET /produtos` | `_id`, `preco`, `descricao`, `quantidade` (query) | ❌ não testados |
+| `POST /produtos` | `nome`, `preco`, `descricao`, `quantidade` | ✅ |
+| `GET /produtos/{id}` | `id` (path) | ✅ |
+| `PUT /produtos/{id}` | `id` (path) + body completo | ✅ |
+| `DELETE /produtos/{id}` | `id` (path) | ✅ |
+| `GET /carrinhos` | `_id`, `idUsuario`, `precoTotal`, `quantidadeTotal` (query) | ❌ nenhum filtro testado |
+| `POST /carrinhos` | `produtos[].idProduto`, `produtos[].quantidade` | ✅ |
+| `GET /carrinhos/{id}` | `id` (path) | ✅ |
+| `DELETE /cancelar-compra` | token (header) | ✅ |
+| `DELETE /concluir-compra` | token (header) | ✅ |
+
+Parâmetros totais mapeados: **~30** | Cobertos: **~24**
+
+**Parameter Coverage ≈ 24/30 = 80%**
+
+> Parâmetros fora: filtros de query em `GET /usuarios` (nome, password), filtros de query em `GET /carrinhos` (idUsuario, precoTotal, quantidadeTotal) e filtros adicionais de `GET /produtos`.
+
+---
+
+### 4. Parameter Value Coverage (Input)
+
+Mede se parâmetros booleanos e enum assumiram todos os valores possíveis.
+
+| Parâmetro | Valores possíveis | Valores testados |
+|---|---|---|
+| `administrador` (POST/PUT `/usuarios`) | `"true"`, `"false"` | `"true"` ✅, `"false"` ✅ |
+| `administrador` (GET `/usuarios` query) | `"true"`, `"false"` | `"true"` ✅, `"false"` ❌ |
+
+**Parameter Value Coverage = 3/4 = 75%**
+
+> Fora: filtro `?administrador=false` em `GET /usuarios` não foi testado explicitamente.
+
+---
+
+### 5. Content-Type Coverage (Input e Output)
+
+A ServeRest aceita e retorna exclusivamente `application/json`. A suíte usa `json=payload`
+em todas as requisições (a lib `requests` define `Content-Type: application/json` automaticamente)
+e valida bodies JSON em todos os testes.
+
+**Content-Type Coverage = 100%**
+
+---
+
+### 6. Operation Flow Coverage (Input)
+
+Mede fluxos encadeados de operações.
+
+| Fluxo | Operações | Coberto? |
+|---|---|---|
+| F01 | POST /usuarios → POST /login → POST /produtos → DELETE /produtos | ✅ (fixtures) |
+| F02 | POST /login → POST /carrinhos → DELETE /cancelar-compra | ✅ C10 |
+| F03 | POST /login → POST /carrinhos → DELETE /concluir-compra | ✅ C11 |
+| F04 | POST /produtos → POST /carrinhos → cancelar → verificar estoque restaurado | ✅ C14 |
+| F05 | POST /produtos → DELETE /produtos com carrinho ativo → 400 | ✅ P20 |
+| F06 | POST /usuarios → GET /usuarios/{id} | ✅ U14 |
+| F07 | Criar produto → filtrar por nome no GET /produtos | ✅ P02 |
+| F08 | POST /login → DELETE /concluir-compra (sem carrinho) | ✅ C12 |
+
+**Operation Flow Coverage = 8/8 = 100%**
+
+---
+
+### 7. Response Properties Body Coverage (Output)
+
+Mede se as propriedades do corpo da resposta estão sendo validadas. A suíte usa JSON Schema
+em todas as respostas de listagem e busca, cobrindo todas as propriedades documentadas.
+
+| Endpoint | Propriedades da resposta | Cobertas via JSON Schema |
+|---|---|---|
+| `POST /login` | `message`, `authorization` | ✅ `LOGIN_SUCESSO_SCHEMA` |
+| `GET /usuarios` | `quantidade`, `usuarios[]` + todas as props do usuário | ✅ `LISTA_USUARIOS_SCHEMA` |
+| `GET /usuarios/{id}` | `_id`, `nome`, `email`, `password`, `administrador` | ✅ `USUARIO_SCHEMA` |
+| `GET /produtos` | `quantidade`, `produtos[]` + todas as props do produto | ✅ `LISTA_PRODUTOS_SCHEMA` |
+| `GET /produtos/{id}` | `_id`, `nome`, `preco`, `descricao`, `quantidade` | ✅ `PRODUTO_SCHEMA` |
+| `GET /carrinhos` | `quantidade`, `carrinhos[]` | ✅ `LISTA_CARRINHOS_SCHEMA` |
+| `GET /carrinhos/{id}` | `_id`, `produtos[]`, `precoTotal`, `quantidadeTotal`, `idUsuario` | ✅ `CARRINHO_SCHEMA` |
+| Respostas de erro | campo `message` | ✅ verificado com `assert "message" in body` |
+
+**Response Properties Body Coverage = 100%**
+
+---
+
+### 8. Status Code Coverage (Output)
+
+Mede quantos status codes possíveis por operação foram exercitados.
+
+| Operação | Status codes possíveis | Cobertos |
+|---|---|---|
+| `POST /login` | 200, 400, 401 | ✅ 200, 400, 401 — **3/3** |
+| `GET /usuarios` | 200, 400 | ✅ 200, 400 — **2/2** |
+| `POST /usuarios` | 201, 400 | ✅ 201, 400 — **2/2** |
+| `GET /usuarios/{id}` | 200, 400 | ✅ 200, 400 — **2/2** |
+| `PUT /usuarios/{id}` | 200, 201, 400 | ✅ 200, 201, 400 — **3/3** |
+| `DELETE /usuarios/{id}` | 200 | ✅ 200 — **1/1** |
+| `GET /produtos` | 200, 400 | ✅ 200 — **1/2** ❌ 400 não testado |
+| `POST /produtos` | 201, 400, 401, 403 | ✅ 201, 400, 401, 403 — **4/4** |
+| `GET /produtos/{id}` | 200, 400 | ✅ 200, 400 — **2/2** |
+| `PUT /produtos/{id}` | 200, 201, 400, 401, 403 | ✅ 200, 201, 400 — **3/5** ❌ 401, 403 não testados |
+| `DELETE /produtos/{id}` | 200, 400, 401, 403 | ✅ 200, 400 — **2/4** ❌ 401, 403 não testados |
+| `GET /carrinhos` | 200 | ✅ 200 — **1/1** |
+| `POST /carrinhos` | 201, 400, 401 | ✅ 201, 400 — **2/3** ❌ 401 não testado |
+| `GET /carrinhos/{id}` | 200, 400 | ✅ 200, 400 — **2/2** |
+| `DELETE /cancelar-compra` | 200, 401 | ✅ 200 — **1/2** ❌ 401 não testado |
+| `DELETE /concluir-compra` | 200, 401 | ✅ 200 — **1/2** ❌ 401 não testado |
+
+Status codes totais mapeados: **39** | Cobertos: **32**
+
+**Status Code Coverage = 32/39 ≈ 82%**
+
+> Status codes fora: 400 em `GET /produtos`, 401/403 em `PUT` e `DELETE /produtos/{id}`, 401 em `POST /carrinhos`, 401 em ambos os DELETEs de carrinho.
+
+---
+
+### Resumo Geral de Cobertura
+
+| Critério | Resultado |
+|---|---|
+| **Path Coverage** | **100%** (9/9) |
+| **Operator Coverage** | **100%** (16/16) |
+| **Parameter Coverage** | **~80%** (~24/30) |
+| **Parameter Value Coverage** | **75%** (3/4) |
+| **Content-Type Coverage** | **100%** |
+| **Operation Flow Coverage** | **100%** (8/8) |
+| **Response Properties Body Coverage** | **100%** |
+| **Status Code Coverage** | **~82%** (32/39) |
+
+**Cobertura média geral ≈ 92%**
+
+### O que ficou fora e por quê
+
+| Item | Motivo |
+|---|---|
+| Filtros de query em `GET /usuarios` (nome, password) | Parâmetros de uso raro; email e administrador são os filtros relevantes |
+| Filtros de query em `GET /carrinhos` (idUsuario, precoTotal) | Identificado como melhoria M03 — baixa prioridade |
+| `?administrador=false` em `GET /usuarios` | Comportamento implicitamente coberto; foi testado `true` e case-sensitive |
+| 401/403 em `PUT` e `DELETE /produtos/{id}` | A instância compassuol é instável para múltiplos logins; priorizados os cenários de negócio |
+| 401 em `POST /carrinhos` e DELETEs de carrinho | Mesmo motivo acima |
+| 400 em `GET /produtos` | A API não documenta cenário de erro para listagem sem filtros inválidos |
 
 ---
 
