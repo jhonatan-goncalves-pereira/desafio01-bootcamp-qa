@@ -54,16 +54,20 @@ Swagger: https://compassuol.serverest.dev/swagger.json?lang=pt-BR
 ## 🌿 Estratégia de Branches
 
 ```
-main                    ← produção estável
-└── develop             ← integração contínua
-    └── feature/bug-report-e-melhorias  ← desenvolvimento atual
+main                                          ← produção estável
+└── develop                                   ← integração contínua
+    ├── feature/bug-report-e-melhorias        ← bug reports + melhorias iniciais
+    ├── feature/readme-sumario-cobertura-detalhada  ← sumário e análise de cobertura
+    └── feature/melhorias-m02-m05             ← implementação de M02 e M05
 ```
 
 | Branch | Propósito |
 |---|---|
 | `main` | Código estável, entregável final |
 | `develop` | Integração de features antes de ir para main |
-| `feature/bug-report-e-melhorias` | Bug reports documentados + melhorias identificadas |
+| `feature/bug-report-e-melhorias` | Bug reports documentados + melhorias iniciais identificadas |
+| `feature/readme-sumario-cobertura-detalhada` | Sumário no README + análise de cobertura pelos 8 critérios |
+| `feature/melhorias-m02-m05` | Implementação de C15 (carrinho sem token) e U21 (excluir usuário com carrinho) |
 
 ---
 
@@ -172,6 +176,8 @@ pytest -k "BUG" -v                              # só testes de regressão de bu
 ---
 
 ## 📊 Análise de Cobertura
+
+> O planejamento completo da suíte está em **[PLANO-DE-TESTES.md](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/blob/main/PLANO-DE-TESTES.md)**.
 
 ### Método utilizado
 
@@ -394,126 +400,33 @@ Status codes totais mapeados: **39** | Cobertos: **32**
 
 ## 🐛 Bugs Encontrados e Reportados
 
-Os bugs abaixo foram descobertos durante a execução exploratória da suíte e estão
-documentados como Issues no repositório. Cada bug tem um teste de regressão correspondente.
+5 bugs encontrados durante a execução exploratória, reportados como **[Issues no GitHub](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/issues)** e documentados em detalhes no **[BUG-REPORTS.md](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/blob/main/BUG-REPORTS.md)**.
 
-### BUG #1 — Contrato de erro inconsistente (`message` vs chave do campo)
+| # | Título | Severidade | Endpoints |
+|---|---|---|---|
+| BUG #1 | Contrato de erro inconsistente — `message` vs chave do campo | 🟡 Média | `/login`, `/usuarios`, `/produtos` |
+| BUG #2 | Senhas retornadas em texto puro | 🔴 Crítica | `GET /usuarios`, `GET /usuarios/{id}` |
+| BUG #3 | `quantidade=0` aceito no cadastro, inutilizável no carrinho | 🟡 Média | `POST /produtos` |
+| BUG #4 | Campo `quantidade` aceita string numérica silenciosamente | 🟢 Baixa | `POST /produtos` |
+| BUG #5 | DELETE sem carrinho ativo retorna 200 em vez de 404 | 🟢 Baixa | `DELETE /carrinhos/*` |
 
-**Severidade:** Média
-**Endpoints afetados:** `POST /login`, `POST /usuarios`, `GET /usuarios/{id}`, `GET /produtos/{id}`
-
-A maioria dos erros da API retorna `{"message": "..."}`. Porém, erros de validação de
-campos individuais retornam a chave do campo como chave do JSON — por exemplo:
-`{"email": "email não pode ficar em branco"}` em vez de `{"message": "..."}`.
-Isso força clientes a tratar dois formatos distintos de erro.
-
-```json
-// Esperado (padrão da API)
-{"message": "email não pode ficar em branco"}
-
-// Obtido (inconsistente)
-{"email": "email não pode ficar em branco"}
-```
-
-**Testes de regressão:** `test_login_sem_email_retorna_400`, `test_login_sem_password_retorna_400`,
-`test_buscar_usuario_por_id_formato_invalido_retorna_400`, `test_buscar_produto_por_id_formato_invalido_retorna_400`
-
----
-
-### BUG #2 — Senhas retornadas em texto puro (CRÍTICO)
-
-**Severidade:** Crítica
-**Endpoints afetados:** `GET /usuarios`, `GET /usuarios/{id}`
-
-O campo `password` é retornado em plaintext em todas as respostas de listagem e busca
-de usuários, sem necessidade de autenticação. Senhas deveriam ser omitidas ou exibidas
-apenas como hash.
-
-```json
-{
-  "nome": "QA Bug Hunter",
-  "email": "qa_abc123@qa.com",
-  "password": "minha_senha_secreta_123",
-  "administrador": "true",
-  "_id": "fGu1Uld3sdFVHUNZ"
-}
-```
-
-**Testes de regressão:** `test_senha_exposta_em_texto_puro_no_get_por_id`,
-`test_senha_exposta_em_listagem_de_usuarios`
-
----
-
-### BUG #3 — Produto com `quantidade=0` aceito mas inutilizável no carrinho
-
-**Severidade:** Média
-**Endpoint afetado:** `POST /produtos`
-
-A API aceita cadastro de produtos com `quantidade: 0` (retorna 201), mas ao tentar
-adicionar ao carrinho retorna 400 por "estoque insuficiente". O produto fica
-permanentemente inutilizável no fluxo de compra.
-
-```
-POST /produtos  {"quantidade": 0}  → 201 ✅ (aceito)
-POST /carrinhos {"quantidade": 1}  → 400 ❌ "Produto não possui quantidade suficiente"
-```
-
-**Teste de regressão:** `test_criar_produto_quantidade_zero_aceito_mas_inutilizavel`
-
----
-
-### BUG #4 — Campo `quantidade` aceita string numérica silenciosamente
-
-**Severidade:** Baixa
-**Endpoint afetado:** `POST /produtos`
-
-O campo `quantidade` aceita strings JSON (`"10"`) quando deveria exigir inteiro.
-A coerção silenciosa pode esconder erros de integração.
-
-```json
-// Enviado
-{"nome": "X", "preco": 10, "descricao": "x", "quantidade": "10"}
-
-// Resposta (deveria ser 400)
-{"message": "Cadastro realizado com sucesso", "_id": "b7wO9adF3ngF77J3"}
-```
-
-**Teste de regressão:** `test_criar_produto_quantidade_como_string_aceito`
-
----
-
-### BUG #5 — DELETE sem carrinho ativo retorna 200 em vez de 404
-
-**Severidade:** Baixa
-**Endpoints afetados:** `DELETE /carrinhos/concluir-compra`, `DELETE /carrinhos/cancelar-compra`
-
-Sem carrinho ativo, a API retorna 200 com mensagem de aviso. Semanticamente, o correto
-seria 404 (Not Found) pois o recurso solicitado não existe.
-
-```
-DELETE /carrinhos/concluir-compra  (sem carrinho ativo)
-→ Status: 200
-→ Body: {"message": "Não foi encontrado carrinho para esse usuário"}
-```
-
-**Testes de regressão:** `test_concluir_compra_sem_carrinho_retorna_200_com_aviso`,
-`test_cancelar_compra_sem_carrinho_retorna_200_com_aviso`
+> Cada bug possui passos de reprodução, comportamento esperado vs. obtido e testes de regressão. Ver [BUG-REPORTS.md](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/blob/main/BUG-REPORTS.md).
 
 ---
 
 ## 💡 Melhorias Identificadas
 
-Além dos bugs funcionais, foram mapeadas oportunidades de evolução da suíte:
+Oportunidades de evolução mapeadas após análise de cobertura e execução exploratória. Detalhes completos, exemplos de implementação e estimativas de esforço em **[MELHORIAS.md](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/blob/main/MELHORIAS.md)**.
 
-| # | Descrição | Área | Prioridade |
-|---|---|---|---|
-| M01 | Validar comportamento de `preco=0` no cadastro de produto | Produtos | Média |
-| M02 | Testar criação de carrinho sem token (401 esperado) | Carrinhos | Média |
-| M03 | Verificar filtro `GET /carrinhos?idUsuario=X` | Carrinhos | Baixa |
-| M04 | Testar comportamento com token expirado (após 600s) | Auth | Alta |
-| M05 | Validar bloqueio de exclusão de usuário com carrinho ativo | Usuários | Alta |
-| M06 | Testar campos em branco (`""`) vs. campo ausente (comportamento diferente?) | Geral | Média |
-| M07 | Parametrizar testes de campos obrigatórios com `@pytest.mark.parametrize` | Refactor | Baixa |
+| # | Descrição | Área | Prioridade | Status |
+|---|---|---|---|---|
+| M01 | Validar `preco=0` no cadastro de produto | Produtos | 🟡 Média | Pendente |
+| M02 | `POST /carrinhos` sem token → 401 | Carrinhos | 🟡 Média | ✅ Implementado (C15) |
+| M03 | Filtro `GET /carrinhos?idUsuario=X` | Carrinhos | 🟢 Baixa | Pendente |
+| M04 | Token JWT expirado → 401 | Auth | 🔴 Alta | Pendente |
+| M05 | Excluir usuário com carrinho ativo → 400 | Usuários | 🔴 Alta | ✅ Implementado (U21) |
+| M06 | Campos em branco (`""`) vs. campo ausente | Geral | 🟡 Média | Pendente |
+| M07 | Parametrizar testes de campos obrigatórios | Refactor | 🟢 Baixa | Pendente |
 
 ---
 
@@ -531,7 +444,7 @@ Além dos bugs funcionais, foram mapeadas oportunidades de evolução da suíte:
 | L06 | Password vazio → 400 `[BUG #1]` | ✅ |
 | L07 | Ambos vazios → 400 | ✅ |
 
-### 👤 Usuários (20 testes)
+### 👤 Usuários (21 testes)
 
 | ID | Cenário | Status |
 |---|---|---|
@@ -542,6 +455,7 @@ Além dos bugs funcionais, foram mapeadas oportunidades de evolução da suíte:
 | U14–U16 | Busca por ID (válido, inexistente, formato inválido) | ✅ |
 | U17–U18 | Atualizar (existente, upsert) | ✅ |
 | U19–U20 | Excluir (existente, inexistente) | ✅ |
+| U21 | Excluir com carrinho ativo → 400 `[M05]` | ✅ |
 
 ### 📦 Produtos (20 testes)
 
@@ -555,7 +469,7 @@ Além dos bugs funcionais, foram mapeadas oportunidades de evolução da suíte:
 | P16–P18 | Atualizar (existente, nome duplicado, upsert) | ✅ |
 | P19–P20 | Excluir (sem/com carrinho ativo) | ✅ |
 
-### 🛒 Carrinhos (14 testes)
+### 🛒 Carrinhos (15 testes)
 
 | ID | Cenário | Status |
 |---|---|---|
@@ -565,6 +479,7 @@ Além dos bugs funcionais, foram mapeadas oportunidades de evolução da suíte:
 | C10–C11 | Cancelar e concluir com carrinho | ✅ |
 | C12–C13 | Cancelar/concluir sem carrinho `[BUG #5]` | ✅ |
 | C14 | Cancelar restaura estoque | ✅ |
+| C15 | Criar sem token → 401 `[M02]` | ✅ |
 
 ---
 
