@@ -7,6 +7,9 @@ validação dos principais fluxos da API ServeRest.
 
 ![Tests](https://github.com/jhonatan-goncalves-pereira/desafio01-bootcamp-qa/actions/workflows/tests.yml/badge.svg)
 
+Resumos da Suíte de testes com Allure:
+https://jhonatan-goncalves-pereira.github.io/desafio01-bootcamp-qa/
+
 ---
 
 ## 📋 Sumário
@@ -60,6 +63,7 @@ main                                          ← produção estável
     ├── feature/bug-report-e-melhorias        ← bug reports + melhorias iniciais
     ├── feature/readme-sumario-cobertura-detalhada  ← sumário e análise de cobertura
     └── feature/melhorias-m02-m05             ← implementação de M02 e M05
+    └── feature/allure-reports             ← implementação visual
 ```
 
 | Branch | Propósito |
