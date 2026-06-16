@@ -69,7 +69,7 @@ e cobertos por testes de regressão identificados com a tag `[BUG #N]`.
 | L06 | Campo password vazio → 400 `[BUG #1]` | Negativo | ✅ |
 | L07 | Ambos os campos vazios → 400 | Negativo | ✅ |
 
-### 👤 /usuarios — 20 testes
+### 👤 /usuarios — 21 testes
 
 | ID | Cenário | Tipo | Status |
 |---|---|---|---|
@@ -93,6 +93,7 @@ e cobertos por testes de regressão identificados com a tag `[BUG #N]`.
 | U18 | Atualizar ID inexistente → 201 (upsert) | Borda | ✅ |
 | U19 | Excluir existente → 200 | Positivo | ✅ |
 | U20 | Excluir ID inexistente → 200 sem registro | Borda | ✅ |
+| U21 | Excluir usuário com carrinho ativo → 400 `[M05]` | Negativo | ✅ |
 
 ### 📦 /produtos — 20 testes
 
@@ -119,7 +120,7 @@ e cobertos por testes de regressão identificados com a tag `[BUG #N]`.
 | P19 | Excluir sem carrinho ativo → 200 | Positivo | ✅ |
 | P20 | Excluir com carrinho ativo → 400 | Negativo | ✅ |
 
-### 🛒 /carrinhos — 14 testes
+### 🛒 /carrinhos — 15 testes
 
 | ID | Cenário | Tipo | Status |
 |---|---|---|---|
@@ -137,6 +138,7 @@ e cobertos por testes de regressão identificados com a tag `[BUG #N]`.
 | C12 | Concluir sem carrinho → 200 com aviso `[BUG #5]` | Bug / Borda | ✅ |
 | C13 | Cancelar sem carrinho → 200 com aviso `[BUG #5]` | Bug / Borda | ✅ |
 | C14 | Cancelar compra restaura estoque do produto | Regressão | ✅ |
+| C15 | Criar carrinho sem token → 401 `[M02]` | Negativo | ✅ |
 
 ---
 
@@ -163,10 +165,10 @@ que vão além dos bugs funcionais:
 | # | Descrição | Área | Prioridade |
 |---|---|---|---|
 | M01 | Adicionar validação de campo `preco=0` — produto gratuito pode ser inconsistente | Produtos | Média |
-| M02 | Testar criação de carrinho sem token (401 esperado) | Carrinhos | Média |
+| ~~M02~~ | ~~Testar criação de carrinho sem token (401 esperado)~~ | Carrinhos | ✅ Implementado (C15) |
 | M03 | Verificar comportamento de `GET /carrinhos` com filtro por `idUsuario` | Carrinhos | Baixa |
 | M04 | Adicionar teste de token expirado (após 600s) — comportamento de renovação | Auth | Alta |
-| M05 | Validar que `DELETE /usuarios/{id}` bloqueia exclusão de usuário com carrinho ativo | Usuários | Alta |
+| ~~M05~~ | ~~Validar que `DELETE /usuarios/{id}` bloqueia exclusão de usuário com carrinho ativo~~ | Usuários | ✅ Implementado (U21) |
 | M06 | Testar payload com campos em branco (`""`) vs. campo ausente — comportamento diferente? | Geral | Média |
 | M07 | Parametrizar testes de validação de campos obrigatórios com `@pytest.mark.parametrize` | Refactor | Baixa |
 
@@ -195,3 +197,4 @@ Um teste é considerado **pronto** quando atende a todos os critérios abaixo:
 | 2026-06-13 | 1.1 | Expansão para Login e Produtos |
 | 2026-06-15 | 2.0 | Execução exploratória — 5 bugs identificados; 61 testes; cobertura 100% |
 | 2026-06-16 | 2.1 | Adição da seção de Melhorias Identificadas (M01–M07); histórico revisado |
+| 2026-06-16 | 2.2 | Implementação de M02 (C15: carrinho sem token → 401) e M05 (U21: excluir usuário com carrinho ativo → 400) |
