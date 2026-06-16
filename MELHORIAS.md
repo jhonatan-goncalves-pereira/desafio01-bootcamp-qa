@@ -283,14 +283,14 @@ def test_cadastrar_usuario_sem_campo_obrigatorio_retorna_400(base_url, campo_aus
 
 ## 📋 Resumo das Melhorias
 
-| # | Descrição | Área | Prioridade | Esforço |
-|---|---|---|---|---|
-| M01 | Validar `preco=0` no cadastro de produto | Produtos | 🟡 Média | 1 pt |
-| M02 | Testar `POST /carrinhos` sem token → 401 | Carrinhos | 🟡 Média | 1 pt |
-| M03 | Verificar filtro `GET /carrinhos?idUsuario=X` | Carrinhos | 🟢 Baixa | 2 pt |
-| M04 | Testar token JWT expirado → 401 | Autenticação | 🔴 Alta | 3 pt |
-| M05 | Validar bloqueio de exclusão de usuário com carrinho | Usuários | 🔴 Alta | 3 pt |
-| M06 | Testar campos em branco (`""`) vs. ausentes | Geral | 🟡 Média | 2 pt |
-| M07 | Parametrizar testes de campos obrigatórios | Refactor | 🟢 Baixa | 2 pt |
+| # | Descrição | Área | Prioridade | Esforço | Status |
+|---|---|---|---|---|---|
+| M01 | Validar `preco=0` no cadastro de produto | Produtos | 🟡 Média | 1 pt | Pendente |
+| M02 | Testar `POST /carrinhos` sem token → 401 | Carrinhos | 🟡 Média | 1 pt | ✅ Implementado (C15) |
+| M03 | Verificar filtro `GET /carrinhos?idUsuario=X` | Carrinhos | 🟢 Baixa | 2 pt | Pendente |
+| M04 | Testar token JWT expirado → 401 | Autenticação | 🔴 Alta | 3 pt | Pendente |
+| M05 | Validar bloqueio de exclusão de usuário com carrinho | Usuários | 🔴 Alta | 3 pt | ✅ Implementado (U21) |
+| M06 | Testar campos em branco (`""`) vs. ausentes | Geral | 🟡 Média | 2 pt | Pendente |
+| M07 | Parametrizar testes de campos obrigatórios | Refactor | 🟢 Baixa | 2 pt | Pendente |
 
 **Total de esforço estimado:** 14 pontos de história
