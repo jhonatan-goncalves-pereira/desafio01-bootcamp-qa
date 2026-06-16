@@ -1,0 +1,33 @@
+name: API Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar testes
+        run: pytest --tb=short -v --html=report.html --self-contained-html
+
+      - name: Publicar relatório HTML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-testes
+          path: report.html
