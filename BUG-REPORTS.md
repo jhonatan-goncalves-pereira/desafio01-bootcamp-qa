@@ -28,6 +28,9 @@ Isso força clientes a implementar dois parsers diferentes para erros.
 
 ### Passos para Reproduzir
 
+<img width="1878" height="944" alt="Image" src="https://github.com/user-attachments/assets/c751218d-fbbb-4fd5-b6ef-c316f3b3c548" />
+<img width="1920" height="966" alt="Image" src="https://github.com/user-attachments/assets/f66ce53e-0bd0-4328-a82e-50589fdea61d" />
+
 ```bash
 # Passo 1: Login sem e-mail
 POST /login
@@ -79,6 +82,8 @@ de todos os usuários cadastrados sem autenticação — a listagem é pública.
 
 Senhas **jamais** devem ser retornadas em respostas de API. Deveriam ser omitidas
 ou armazenadas/retornadas apenas como hash irreversível (bcrypt, argon2, etc).
+
+<img width="1916" height="970" alt="Image" src="https://github.com/user-attachments/assets/99678337-224e-4afd-8ca7-15d08d4de3ec" />
 
 ### Passos para Reproduzir
 
@@ -143,6 +148,9 @@ Porém, ao tentar adicionar esse produto a um carrinho, o sistema retorna 400
 por "estoque insuficiente". O produto fica permanentemente inutilizável no
 fluxo de compra sem qualquer aviso no momento do cadastro.
 
+<img width="1918" height="1041" alt="Image" src="https://github.com/user-attachments/assets/ffe7442a-603d-47b4-9892-0178825eadc1" />
+<img width="1862" height="1035" alt="Image" src="https://github.com/user-attachments/assets/88650752-95e3-4a07-b3cb-fca48d750c8d" />
+
 ### Passos para Reproduzir
 
 ```bash
@@ -192,6 +200,8 @@ o valor como string JSON (`"10"` em vez de `10`), a API aceita e retorna 201
 sem nenhuma mensagem de aviso ou erro. A coerção silenciosa de tipos pode
 esconder erros de integração em clientes que trafegam dados via formulários
 HTML (onde todos os valores chegam como string).
+
+<img width="1760" height="1035" alt="Image" src="https://github.com/user-attachments/assets/72e57f5c-740e-4e22-a00d-efa294bc855b" />
 
 ### Passos para Reproduzir
 
@@ -245,6 +255,9 @@ ativo, a API retorna status **200** com mensagem `"Não foi encontrado carrinho 
 esse usuário"`. O semanticamente correto seria **404** (Not Found), pois o recurso
 solicitado não existe. O status 200 pode levar clientes a interpretar que a operação
 foi bem-sucedida, silenciando um estado de erro.
+
+<img width="1760" height="1027" alt="Image" src="https://github.com/user-attachments/assets/4b5ffc94-dd9c-431b-b2a9-01bb7331a036" />
+<img width="1794" height="1023" alt="Image" src="https://github.com/user-attachments/assets/c18b6c88-0947-46cf-b67f-bcee1417aa88" />
 
 ### Passos para Reproduzir
 
