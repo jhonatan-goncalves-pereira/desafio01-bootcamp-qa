@@ -27,8 +27,12 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
+      - name: Verificar instalação do pytest-timeout
+        run: python -c "import pytest_timeout; print('pytest-timeout OK')"
+
       - name: Executar testes
         run: pytest --tb=short -v --html=report.html --self-contained-html
+        continue-on-error: false
 
       - name: Publicar relatório HTML
         uses: actions/upload-artifact@v4
